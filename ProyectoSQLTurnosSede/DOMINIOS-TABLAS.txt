@@ -1,0 +1,131 @@
+CREATE DOMAIN TIPO_codigopostal AS TEXT
+CHECK(
+   VALUE ~ '^[0-9]{4}$'
+);
+
+CREATE DOMAIN TIPO_direccionEmail AS TEXT
+CHECK(
+   VALUE ~ '^[A-Za-z0-9._-]{5,50}[@][A-Za-z0-9.-]{4,50}[.][A-Za-z]{2,3}$'
+);
+
+CREATE DOMAIN TIPO_numeroTelefono AS TEXT
+CHECK(
+   VALUE ~ '^[0-9]{2}[\s][0-9]{4}[-][0-9]{4}$'
+OR VALUE ~ '^[0-9]{3}[\s][0-9]{3}[-][0-9]{4}$'
+OR VALUE ~ '^[0-9]{4}[\s][0-9]{2}[-][0-9]{4}$'
+);
+
+CREATE DOMAIN TIPO_cuit AS TEXT
+CHECK(
+   VALUE ~ '^(30|33|34)[-][0-9]{8}[-][0-9]{1}$'
+);
+
+CREATE DOMAIN TIPO_cuil AS TEXT
+CHECK(
+   VALUE ~ '^(20|23|24|25|26|27)[-][0-9]{8}[-][0-9]{1}$'
+);
+
+CREATE DOMAIN TIPO_turno AS TEXT
+CHECK(
+   VALUE ~* '^(Mañana|Tarde|Noche)$'
+);
+
+CREATE DOMAIN TIPO_diasemana AS TEXT
+CHECK(
+   VALUE ~* '^(Lunes|Martes|Miercoles|Jueves|Viernes|Sabado|Domingo)$'
+);
+
+CREATE DOMAIN TIPO_servicio AS TEXT
+CHECK(
+   VALUE ~* '^(Juridico|Financiero|Contable)$'
+);
+
+CREATE DOMAIN TIPO_EstadoCita AS TEXT
+CHECK(
+   VALUE ~* '^(Pendiente|Finalizada|Cancelada)$'
+);
+
+CREATE TABLE Provincia (
+idProvincia int CHECK (idProvincia>0 and idProvincia<24) NOT NULL, nombre varchar(50) NOT NULL,
+PRIMARY KEY (idProvincia)
+);
+
+
+CREATE TABLE Localidad (
+cp TIPO_codigopostal NOT NULL, nombre varchar(50) NOT NULL,idProvincia int CHECK (idProvincia>0 and idProvincia<24) NOT NULL,
+PRIMARY KEY(cp),
+FOREIGN KEY (idProvincia) REFERENCES Provincia (idProvincia)
+);
+
+CREATE TABLE Distancia (
+cp1 TIPO_codigopostal NOT NULL, cp2 TIPO_codigopostal NOT NULL, distancia int CHECK(distancia >=0) NOT NULL,
+PRIMARY KEY (cp1,cp2),
+FOREIGN KEY (cp1) REFERENCES Localidad(cp),
+FOREIGN KEY (cp2) REFERENCES Localidad(cp)
+);
+
+CREATE TABLE Cliente (
+cp TIPO_codigopostal NOT NULL, nroCliente int CHECK (nroCliente>0) NOT NULL, email TIPO_direccionEmail, telefono TIPO_numeroTelefono, celular TIPO_numeroTelefono NOT NULL,  nombreCalle varchar(50) NOT NULL, numeroCalle int CHECK (numeroCalle>0), piso int CHECK (piso>=0),departamento varchar(2),
+PRIMARY KEY (nroCLiente),
+FOREIGN KEY (cp) REFERENCES Localidad(cp)
+);
+
+CREATE TABLE PersonaJuridica (
+razonSocial varchar(50) NOT NULL, cuit TIPO_cuit NOT NULL, nroCliente int CHECK (nroCliente>0) NOT NULL,
+PRIMARY KEY (nroCliente),
+UNIQUE (cuit),
+FOREIGN KEY (nroCliente) REFERENCES Cliente(nroCliente)
+);
+
+CREATE TABLE PersonaFisica (
+nombre varchar(50) NOT NULL, apellido varchar(50) NOT NULL, cuil TIPO_cuil, nroDocumento int CHECK (nroDocumento >0) NOT NULL, nroCliente int CHECK (nroCliente>0) NOT NULL,
+PRIMARY KEY (nroCliente),
+UNIQUE (cuil),
+FOREIGN KEY (nroCliente) REFERENCES Cliente(nroCliente)
+);
+
+CREATE TABLE Oficina (
+idOficina int CHECK (idOficina>0) NOT NULL, nombre varchar(50) NOT NULL, cp TIPO_codigopostal NOT NULL,
+PRIMARY KEY (idOficina),
+FOREIGN KEY (cp) REFERENCES Localidad (cp)
+);
+
+CREATE TABLE DiaAtencion (
+dia TIPO_diasemana NOT NULL, turno TIPO_turno NOT NULL, horaIni time NOT NULL, horaFin time NOT NULL, idOficina int CHECK (idOficina>0) NOT NULL,
+PRIMARY KEY (dia, turno,idOficina),
+FOREIGN KEY (idOficina) REFERENCES Oficina (idOficina)
+);
+
+CREATE TABLE Servicio (
+idServicio int CHECK (idServicio>0) NOT NULL,nombreServicio varchar(50) NOT NULL, descripcion varchar(250), duracion time, tipo TIPO_servicio,
+PRIMARY KEY (idServicio)
+);
+
+CREATE TABLE Funcionario (
+nroDocumento int CHECK (nroDocumento >0) NOT NULL, nombre varchar(50) NOT NULL, apellido varchar(50) NOT NULL, profesion varchar(50) NOT NULL,idOficina int CHECK (idOficina>0) NOT NULL,funcionarioACargo int CHECK (funcionarioACargo >0),
+PRIMARY KEY (nroDocumento),
+FOREIGN KEY (idOficina) REFERENCES Oficina (idOficina),
+FOREIGN KEY (funcionarioACargo) REFERENCES Funcionario (nroDocumento)
+);
+
+CREATE TABLE RealizaServicio (
+nroDocumento int CHECK (nroDocumento >0) NOT NULL,idServicio int CHECK (idServicio>0) NOT NULL,
+PRIMARY KEY (nroDocumento, idServicio),
+FOREIGN KEY (nroDocumento) REFERENCES Funcionario (nroDocumento),
+FOREIGN KEY (idServicio) REFERENCES Servicio (idServicio)
+);
+
+CREATE TABLE Cita (
+idCita int CHECK(idCita>0) NOT NULL, fechaCita date NOT NULL, horarioCita time NOT NULL,nroCliente int CHECK (nroCliente>0) NOT NULL,duracionCita int, idOficina int CHECK (idOficina>0) NOT NULL,nroDocumento int CHECK (nroDocumento >0) NOT NULL, idServicio int CHECK (idServicio>0) NOT NULL,dia TIPO_diasemana NOT NULL,
+PRIMARY KEY (idCita),
+FOREIGN KEY (nroCliente) REFERENCES Cliente (nroCliente),
+FOREIGN KEY (idOficina) REFERENCES Oficina (idOficina),
+FOREIGN KEY (nroDocumento) REFERENCES Funcionario (nroDocumento),
+FOREIGN KEY (idServicio) REFERENCES Servicio (idServicio)
+);
+
+CREATE TABLE EstadoCita (
+idCita int CHECK(idCita>0) NOT NULL,idEstado int CHECK (idEstado>0) NOT NULL, descripcion TIPO_EstadoCita NOT NULL, fechaEstado date NOT NULL, horaEstado time NOT NULL,
+PRIMARY KEY (idCita, idEstado),
+FOREIGN KEY (idCita) REFERENCES Cita(idCita)
+);

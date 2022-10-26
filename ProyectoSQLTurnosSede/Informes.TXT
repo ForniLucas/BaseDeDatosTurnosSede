@@ -1,0 +1,314 @@
+--------------INFORME I--------------
+
+--Un reporte que se generará automáticamente el último día de cada mes, donde conste,
+--por cada oficina y servicio, en el mes a evaluar, la cantidad de empleados destinados a la
+--atención, el tiempo promedio de atención, la cantidad de citas registras que finalizaron
+--correctamente (es decir, en estado “Finalizada”).
+
+CREATE OR REPLACE FUNCTION empleadosEnTiempo (fechaIni date, fechaFin date)
+RETURNS TABLE (idOficina int, idServicio int,nroDocumento int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT DISTINCT a.idOficina, a.idServicio, a.nroDocumento
+FROM Cita a JOIN EstadoCita b on (a.idCita=b.idCita) 
+WHERE (a.fechaCita >= fechaIni) and (a.fechaCita<= fechaFin) and (b.descripcion~*'Finalizada')
+) ;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION cantidadEmpleadosEnTiempo (feachIni date, fechaFin date)
+RETURNS TABLE (idOficina int, idServicio int, cantidadEmpleados bigint)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT a.idOficina, a.idServicio, count(*) as cantiad
+FROM empleadosEnTiempo (feachIni, fechaFin) a
+GROUP BY a.idOficina,a.idServicio
+) ;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION oficinaServicioCitaDuracionEnTiempo (fechaIni date, fechaFin date)
+RETURNS TABLE (idOficina int, idServicio int,idCita int, duracionCita int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT a.idOficina, a.idServicio,a.idCita,a.duracionCita
+FROM Cita a JOIN EstadoCita b on (a.idCita=b.idCita) 
+WHERE (a.fechaCita>= (fechaIni)) and (a.fechaCita<= fechaFin) and (b.descripcion~*'Finalizada')
+) ;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION duracionPromedioEnTiempo (fechaini date, fechaFin date)
+RETURNS TABLE (idOficina int, idServicio int,promedioDuracion numeric)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT a.idOficina, a.idServicio, AVG(duracionCita) as promedioDuracion
+FROM oficinaServicioCitaDuracionEnTiempo (fechaini, fechaFin) a
+GROUP BY a.idOficina,a.idServicio
+) ;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION citasEnTiempo (fechaIni date, fechaFin date)
+RETURNS TABLE (idOficina int, idServicio int,idCita int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT DISTINCT a.idOficina, a.idServicio,a.idCita
+FROM Cita a JOIN EstadoCita b on (a.idCita=b.idCita) 
+WHERE (a.fechaCita>= (fechaIni)) and (a.fechaCita<= fechaFin) and (b.descripcion~*'Finalizada')
+);
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION cantidadCitasEnTiempo (feachini date, fechaFin date)
+RETURNS TABLE (idOficina int, idServicio int, cantidadCitas bigint)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT a.idOficina, a.idServicio, count(*) as cantiad
+FROM citasEnTiempo (feachini, fechaFin) a
+GROUP BY a.idOficina,a.idServicio
+) ;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION informeCantidadCitasCantidadEmpleadosPromedioDuracion (comienzoMes date)
+RETURNS TABLE (idOficina int, idServicio int,cantidadCitas bigint,cantidadEmpleados bigint,promedioDuracion numeric)
+LANGUAGE plpgsql
+AS
+$$
+DECLARE 
+fechaIni date := comienzoMes;
+fechaFin date := (comienzoMes + interval '1 months');
+BEGIN
+RETURN QUERY (SELECT DISTINCT a.idOficina, a.idServicio,b.cantidadCitas,a.cantidadEmpleados,d.promedioDuracion
+FROM cantidadEmpleadosEnTiempo(fechaIni,fechaFin) a JOIN cantidadCitasEnTiempo(fechaIni,fechaFin) b on (a.idOficina=b.idOficina and a.idServicio=b.idServicio) JOIN duracionPromedioEnTiempo(fechaIni,fechaFin) d on (a.idOficina=d.idOficina and a.idServicio=d.idServicio)
+) ;
+END;
+$$;
+
+
+
+
+--------------INFORME II--------------
+
+
+--Un informe con aquellos funcionarios que no hayan atendido ninguna cita (ya sea porque
+--no las hubo o porque se cancelaron) durante los últimos 7 días desde la consulta del
+--reporte, informar todos sus datos personales, su profesión, la oficina en la que trabaja, el
+--servicio para el que no registró citas, y nombre y apellido de su responsable (si es que lo
+--tiene).
+
+CREATE OR REPLACE FUNCTION funcionariosQueTuvieronCita()
+RETURNS TABLE (nroDocumento int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN query
+    (SELECT c.nrodocumento
+    FROM (cita a JOIN estadoCita b on (a.idCita=b.idCita)) c
+    WHERE (c.descripcion ~* 'Pendiente' or c.descripcion ~* 'Finalizada') and (c.fechaCita>= (CURRENT_DATE - interval '1 week')) and (c.fechaCita<= CURRENT_DATE)
+    );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION funcionariosSinCita ()
+RETURNS TABLE (nroDocumento int, nombre varchar(50), apellido varchar(50), profesion varchar(50),idOficina int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+return query (
+SELECT x.nroDocumento, x.nombre, x.apellido, x.profesion, x.idOficina
+FROM Funcionario x left join (select * from funcionariosQueTuvieronCita()) y on x.nrodocumento = y.nrodocumento where y.nrodocumento is null
+);
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION informeFuncionariosSinCita ()
+RETURNS TABLE (nroDocumento int, nombre varchar(50), apellido varchar(50) ,profesion varchar(50) ,idOficina int,nombreServicio varchar(50),nombreEncargado varchar(50),apellidoEncargado varchar(50))
+LANGUAGE plpgsql
+AS
+$$
+    begin
+   	 return query(
+   		 select a.nroDocumento, a.nombre, a.apellido, a.profesion, a.idOficina, d.nombreServicio, e.nombre , e.apellido
+   		 from funcionariosSinCita() a join funcionario f on (a.nroDocumento = f.nroDocumento) left outer join funcionario e on (f.funcionarioACargo = e.nroDocumento) join realizaServicio c on (a.nroDocumento = c.nroDocumento) join servicio d on (c.idServicio = d.idServicio)
+   	 );
+   	 
+    end
+$$
+
+
+--------------INFORME III--------------
+
+--Un listado con aquellos clientes de tipo persona jurídica que solo han tenido citas para
+--servicios del tipo “Jurídico”, informar la razón social, número de CUIT, y oficina y servicio
+--de la última cita que registró.
+
+
+
+
+CREATE OR REPLACE FUNCTION personasJuridica()
+RETURNS TABLE (nroCliente int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT a.nroCliente
+FROM  Cliente a JOIN PersonaJuridica b on a.nroCliente = b.nroCliente
+);
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION personaJuridicaQueTuvieronCitaParaServicioNoJuridico()
+RETURNS TABLE (nroCliente int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT a.nroCliente
+FROM Cita a JOIN personasJuridica() b on (a.nroCliente=b.nroCliente) JOIN Servicio d on (a.idServicio=d.idServicio) 
+WHERE d.tipo ~* 'Financiero' or d.tipo ~* 'Contable'
+) ;
+END;
+$$;
+
+
+						   
+CREATE OR REPLACE FUNCTION personaJuridicaQueTuvieronCitaParaServicioJuridico()
+RETURNS TABLE (nroCliente int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY(SELECT a.nroCliente 
+FROM personasjuridica() a LEFT JOIN personaJuridicaQueTuvieronCitaParaServicioNoJuridico() x on a.nroCliente = x.nroCliente 
+WHERE x.nroCliente IS NULL);
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION personaJuridicaQueSoloTuvieronCitaParaServicioJuridico()
+RETURNS TABLE (nroCliente int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT a.nroCliente
+from personaJuridicaQueTuvieronCitaParaServicioJuridico() a JOIN Cita b on (a.nroCliente=b.nroCliente) JOIN Servicio d on (b.idServicio=d.idServicio)
+);
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION citasCliente (numCliente int)
+RETURNS TABLE (idCita int, fechaCita date, horarioCita time, dia TIPO_diaSemana, nroCliente int, duracionCita int, idOficina int, nroDocumento int, idServicio int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT a.idCita, a.fechaCita, a.horarioCita, a.dia, a.nroCliente, a.duracionCita, a.idOficina, a.nroDocumento, a.idServicio 
+FROM
+Cita a
+WHERE a.nroCliente=numCliente);
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION ultimoDiaCitaCliente (numCliente int)
+RETURNS TABLE (idCita int, fechaCita date, horarioCita time, dia TIPO_diasemana, nroCliente int, duracionCita int, idOficina int, nroDocumento int, idServicio int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY(SELECT *
+FROM
+citasCliente(numCliente) a
+WHERE a.fechaCita=(SELECT MAX(b.fechaCita) FROM citasCliente(numCliente) b
+));
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION ultimaCitaDeCliente(numCliente int)
+RETURNS int
+LANGUAGE plpgsql
+AS
+$$
+DECLARE 
+cita int;
+BEGIN
+SELECT idCita
+INTO cita
+FROM
+ultimoDiaCitaCliente (numCliente) a
+WHERE a.horarioCita=(SELECT MAX(horarioCita) FROM ultimoDiaCitaCliente (numCliente));
+RETURN cita;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION informePersJuridicaCitaJuridica ()
+RETURNS TABLE (razonSocial varchar(50), cuit TIPO_cuit, idOficina int, nombreServicio varchar(50))
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY ( SELECT b.razonSocial, b.cuit, d.idOficina, f.nombreServicio
+FROM
+personaJuridicaQueSoloTuvieronCitaParaServicioJuridico() a JOIN personajuridica b on (a.nroCliente=b.nroCliente)
+JOIN Cita d on (d.idCita=(ultimaCitaDeCliente(a.nroCliente))) 
+JOIN Servicio f on (f.idServicio=d.idServicio)
+);
+END;
+$$;
+
+--------------INFORME IV--------------
+
+
+--Para un mes determinado, por cada oficina listar el servicio con la mayor cantidad de
+--cancelaciones, indicando dicha cantidad.
+
+
+
+CREATE OR REPLACE FUNCTION servicioCancelacionesEnOficinaEnDeterminadoTiempo (fechaini date, fechaFin date)
+RETURNS TABLE (idOficina int, idServicio int,nombreServicio varchar(50),idCita int)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+RETURN QUERY (SELECT  a.idOficina, e.idServicio,e.nombreServicio,a.idCita
+FROM cita a JOIN estadoCita b on (a.idCita=b.idCita) JOIN Servicio e on (e.idServicio=a.idServicio) JOIN Oficina f on (f.idOficina= a.idOficina)
+WHERE (a.fechaCita>= (fechaIni)) and (a.fechaCita<= fechaFin) and (b.descripcion~*'Cancelada')
+) ;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION informeCantidadServicioCanceladoEnOficina (principioDeMes date)
+RETURNS TABLE (idOficina int, idServicio int,nombreServicio varchar(50),cantidadCancelado bigint)
+LANGUAGE plpgsql
+AS
+$$
+DECLARE 
+fechaIni date := principioDeMes;
+fechaFin date := (principioDeMes+ interval '1 months');
+BEGIN
+RETURN QUERY (SELECT a.idOficina, a.idServicio,a.nombreServicio, count(*) as cantiadCancelaciones
+FROM servicioCancelacionesEnOficinaEnDeterminadoTiempo (fechaini, fechaFin) a
+GROUP BY a.idOficina,a.idServicio,a.nombreServicio
+) ;
+END;
+$$;

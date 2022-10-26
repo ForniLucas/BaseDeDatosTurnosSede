@@ -1,0 +1,230 @@
+--/*/*/ PROVINCIAS (idProvincia, nombre) /*/*/--
+insert into Provincia values (1,'Entre Ríos');
+insert into Provincia values(2, 'Buenos Aires');
+insert into Provincia values(3, 'Tucumán');
+
+--/*/*/ LOCALIDADES (cp, nombre, idProvincia) /*/*/--
+insert into Localidad values (2820,'Gualeguaychú', 1);
+insert into Localidad values(3260, 'Concepción del Uruguay', 1);
+insert into Localidad values(3218, 'San Salvador', 1);
+insert into Localidad values(1836, 'Adrogué', 2);
+insert into Localidad values(4129, 'Ingenio San Pablo', 3);
+
+--/*/*/ CLIENTES (cp, nroCliente, email, telefono, celular,  nombreCalle, numeroCalle, piso, departamento) /*/*/--
+--/*/*/ PERSONAS FÍSICAS (nombre, apellido, cuil, nroDocumento, nroCliente) /*/*/--
+--/*/*/ PERSONAS JURÍDICAS (razonSocial, cuit, nroCliente) /*/*/--
+
+-- Clientes de Gualeguaychú --
+insert into Cliente values (2820, 1, 'elgarra7@gmail.com', null, '3446 25-7745', 'Jujuy', 300, null, null);
+insert into personafisica values ('Sanchez', 'Garrafa', '27-20157863-8', 20157863, 1);
+insert into Cliente values (2820, 2, 'satanas999@hotmail.com', null, '3446 14-1889', 'Jujuy', 305, null, null);
+insert into personafisica values ('Paez', 'Satanás', '23-27895444-1', 27895444, 2);
+insert into Cliente values (2820, 3, 'kaput.contact@gmail.com', null, '3446 22-7863', 'Jujuy', 512, 2, '3');
+insert into personajuridica values ('Kaput', '30-17569388-3', 3);
+
+-- Clientes de Concepción del Uruguay --
+insert into Cliente values (3260, 4, 'mantequita3@gmail.com', null, '3442 86-1443', 'Suipacha', 348, 1, 'C');
+insert into personafisica values ('Martinez', 'Manteca', '20-25783221-1', 25783221, 4);
+insert into Cliente values (3260, 5, 'mora_cachete@gmail.com', null, '3442 58-7963', 'Galarza', 1203, null, null);
+insert into personafisica values ('Morales', 'Cachete', '24-30578961-7', 30578961, 5);
+insert into Cliente values (3260, 6, 'petardos_contact@gmail.com', null, '3442 11-8568', 'Rocamora', 100, null, null);
+insert into personajuridica values ('Petardos Don García', '33-55569324-5', 6);
+
+-- Clientes de San Salvador --
+insert into Cliente values (3218, 7, 'poroto.cub55@gmail.com', null, '345 432-3981', 'Francisco Ramirez', 204, null, null);
+insert into personafisica values ('Cubero', 'Poroto', '27-17645331-2', 17645331, 7);
+insert into Cliente values (3218, 8, 'elpolaba12@gmail.com', null, '345 589-4445', 'San Martín', 365, null, null);
+insert into personafisica values ('Bastia', 'Polaco', '27-21756755-7', 21756755, 8);
+insert into Cliente values (3218, 9, 'contact_bananas@gmail.com', null, '345 685-1112', 'Papa Francisco', 48, null, null);
+insert into personajuridica values ('Bananas Pueyrredon', '33-56569323-5', 9);
+
+-- Clientes de Adrogué --
+insert into Cliente values (1836, 10, 'mcorbalan15@gmail.com', null, '11 1569-6644', 'Adrogué 1', 1700, null, null);
+insert into personafisica values ('Corbalan', 'Mugre', '20-32569994-2', 32569994, 10);
+insert into Cliente values (1836, 11, 'facturamarron5@gmail.com', null, '11 1156-8855', 'Adrogué 1', 1701, 8, '8A');
+insert into personafisica values ('Brown', 'Fatura', '24-35699967-7', 35699967, 11);
+insert into Cliente values (1836, 12, 'fibrones_florete.adrogue.contact@gmail.com', null, '11 5555-3264', 'Adrogué 2', 2306, null, null);
+insert into personajuridica values ('Fibrones Florete', '34-14589332-1', 12);
+
+-- Clientes de Ingenio San Pablo --
+insert into Cliente values (4129, 13, 'disco333@gmail.com', null, '381 443-2577', 'Ingenio 1', 1356, null, null);
+insert into personafisica values ('Nuñez', 'Discoteca', '27-34698887-2', 34698887, 13);
+insert into Cliente values (4129, 14, 'gg4444@gmail.com', null, '381 155-1473', 'Ingenio 37', 177, null, null);
+insert into personafisica values ('Gómez', 'Gomito', '24-29663356-2', 29663356, 14);
+insert into Cliente values (4129, 15, 'piojopum@yahoo.com.ar', null, '381 896-9932', 'Ingenio 2', 400, null, null);
+insert into personajuridica values ('Piojopum', '30-11852334-9', 15);
+
+--/*/*/ OFICINAS (idOficina, nombre, cp)  /*/*/--
+insert into oficina values (1, 'OFI_G_1', 2820);
+insert into oficina values (2, 'OFI_G_2', 2820);
+insert into oficina values (3, 'OFI_C_1', 3260);
+insert into oficina values (4, 'OFI_C_2', 3260);
+insert into oficina values (5, 'OFI_S_1', 3218);
+insert into oficina values (6, 'OFI_S_2', 3218);
+insert into oficina values (7, 'OFI_A_1', 1836);
+insert into oficina values (8, 'OFI_A_2', 1836);
+insert into oficina values (9, 'OFI_I_1', 4129);
+insert into oficina values (10, 'OFI_I_2', 4129);
+
+--/*/*/ DÍAS DE ATENCIÓN (dia, turno, horaIni, horaFin, idOficina) /*/*/--
+insert into diaatencion values ('Lunes', 'Mañana', '08:00:00', '16:00:00', 1);
+insert into diaatencion values ('Martes', 'Mañana', '08:00:00', '11:00:00', 1);
+insert into diaatencion values ('Miercoles', 'Mañana', '08:00:00', '11:00:00', 1);
+insert into diaatencion values ('Jueves', 'Mañana', '08:00:00', '11:00:00', 1);
+insert into diaatencion values ('Viernes', 'Mañana', '08:00:00', '11:00:00', 1);
+insert into diaatencion values ('Lunes', 'Mañana', '08:00:00', '11:00:00', 2);
+insert into diaatencion values ('Martes', 'Mañana', '08:00:00', '11:00:00', 2);
+insert into diaatencion values ('Miercoles', 'Mañana', '08:00:00', '11:00:00', 2);
+insert into diaatencion values ('Jueves', 'Mañana', '08:00:00', '11:00:00', 2);
+insert into diaatencion values ('Viernes', 'Mañana', '08:00:00', '11:00:00', 2);
+insert into diaatencion values ('Lunes', 'Mañana', '08:00:00', '11:00:00', 3);
+insert into diaatencion values ('Martes', 'Mañana', '08:00:00', '11:00:00', 3);
+insert into diaatencion values ('Miercoles', 'Mañana', '08:00:00', '11:00:00', 3);
+insert into diaatencion values ('Jueves', 'Mañana', '08:00:00', '11:00:00', 3);
+insert into diaatencion values ('Viernes', 'Mañana', '08:00:00', '11:00:00', 3);
+insert into diaatencion values ('Lunes', 'Mañana', '08:00:00', '11:00:00', 4);
+insert into diaatencion values ('Martes', 'Mañana', '08:00:00', '11:00:00', 4);
+insert into diaatencion values ('Miercoles', 'Mañana', '08:00:00', '11:00:00', 4);
+insert into diaatencion values ('Jueves', 'Mañana', '08:00:00', '11:00:00', 4);
+insert into diaatencion values ('Viernes', 'Mañana', '08:00:00', '11:00:00', 4);
+insert into diaatencion values ('Lunes', 'Mañana', '08:00:00', '11:00:00', 5);
+insert into diaatencion values ('Martes', 'Mañana', '08:00:00', '11:00:00', 5);
+insert into diaatencion values ('Miercoles', 'Mañana', '08:00:00', '11:00:00', 5);
+insert into diaatencion values ('Jueves', 'Mañana', '08:00:00', '11:00:00', 5);
+insert into diaatencion values ('Viernes', 'Mañana', '08:00:00', '11:00:00', 5);
+insert into diaatencion values ('Lunes', 'Mañana', '08:00:00', '11:00:00', 6);
+insert into diaatencion values ('Martes', 'Mañana', '08:00:00', '11:00:00', 6);
+insert into diaatencion values ('Miercoles', 'Mañana', '08:00:00', '11:00:00', 6);
+insert into diaatencion values ('Jueves', 'Mañana', '08:00:00', '11:00:00', 6);
+insert into diaatencion values ('Viernes', 'Mañana', '08:00:00', '11:00:00', 6);
+insert into diaatencion values ('Lunes', 'Mañana', '08:00:00', '11:00:00', 7);
+insert into diaatencion values ('Martes', 'Mañana', '08:00:00', '11:00:00', 7);
+insert into diaatencion values ('Miercoles', 'Mañana', '08:00:00', '11:00:00', 7);
+insert into diaatencion values ('Jueves', 'Mañana', '08:00:00', '11:00:00', 7);
+insert into diaatencion values ('Viernes', 'Mañana', '08:00:00', '11:00:00', 7);
+insert into diaatencion values ('Lunes', 'Mañana', '08:00:00', '11:00:00', 8);
+insert into diaatencion values ('Martes', 'Mañana', '08:00:00', '11:00:00', 8);
+insert into diaatencion values ('Miercoles', 'Mañana', '08:00:00', '11:00:00', 8);
+insert into diaatencion values ('Jueves', 'Mañana', '08:00:00', '11:00:00', 8);;
+insert into diaatencion values ('Viernes', 'Mañana', '08:00:00', '11:00:00', 8);
+insert into diaatencion values ('Lunes', 'Mañana', '08:00:00', '11:00:00', 9);
+insert into diaatencion values ('Martes', 'Mañana', '08:00:00', '11:00:00', 9);
+insert into diaatencion values ('Miercoles', 'Mañana', '08:00:00', '11:00:00', 9);
+insert into diaatencion values ('Jueves', 'Mañana', '08:00:00', '11:00:00', 9);
+insert into diaatencion values ('Viernes', 'Mañana', '08:00:00', '11:00:00', 9);
+insert into diaatencion values ('Lunes', 'Mañana', '08:00:00', '11:00:00', 10);
+insert into diaatencion values ('Martes', 'Mañana', '08:00:00', '11:00:00', 10);
+insert into diaatencion values ('Miercoles', 'Mañana', '08:00:00', '11:00:00', 10);
+insert into diaatencion values ('Jueves', 'Mañana', '08:00:00', '11:00:00', 10);
+insert into diaatencion values ('Viernes', 'Mañana', '08:00:00', '11:00:00', 10);
+
+--/*/*/ SERVICIOS (idServicio, nombreServicio, descripcion, duracion, tipo) /*/*/--
+insert into servicio values (1, 'Defensa Legal de PyMEs', '...', '00:30:00', 'Juridico');
+insert into servicio values (2, 'Defensa Legal de Trabajadores', '...', '00:30:00', 'Juridico');
+insert into servicio values (3, 'Asesoramiento Legal a Consumidores', '...', '00:30:00', 'Juridico');
+insert into servicio values (4, 'Operaciones de Compra-Venta de Valores', '...', '00:30:00', 'Contable');
+insert into servicio values (5, 'Gestión de Carteras de Inversión', '...', '00:30:00', 'Financiero');
+insert into servicio values (6, 'Asesoramiento sobre Productos de Inversión', '...', '00:30:00', 'Financiero');
+
+--/*/*/ FUNCIONARIOS (nroDocumento, nombre, apellido, profesion, idOficina, funcionarioACargo) /*/*/--
+insert into funcionario values (35896225, 'Marciano', 'Ortiz', 'Abogado', 1, null);
+insert into funcionario values (34125558, 'Gallego', 'Moreno y Fabianesi', 'Contador', 2, null);
+insert into funcionario values (39567449, 'Facha', 'Bartelt', 'Contador', 2, 34125558);
+insert into funcionario values (23665456, 'Almanaque', 'Gonzales', 'Abogado', 3, null);
+insert into funcionario values (29856313, 'Uvita', 'Fernandez', 'Contador', 4, null);
+insert into funcionario values (38723366, 'Juan', 'Perez', 'Contador', 4, 29856313);
+insert into funcionario values (20578445, 'Lavandina', 'Bergessio', 'Abogado', 5, null);
+insert into funcionario values (26313252, 'Mostaza', 'Merlo', 'Contador', 6, null);
+insert into funcionario values (39665172, 'Sifón', 'Úbeda', 'Contador', 6, 26313252);
+insert into funcionario values (22596888, 'Pulga', 'Rodriguez', 'Abogado', 7, null);
+insert into funcionario values (22355222, 'Pichi', 'Mercier', 'Contador', 8, null);
+insert into funcionario values (37598221, 'Bichi', 'Fuertes', 'Contador', 8, 22355222);
+insert into funcionario values (28144456, 'Vitamina', 'Sanchez', 'Abogado', 9, null);
+insert into funcionario values (22998748, 'Trapito', 'Barovero', 'Contador', 10, null);
+insert into funcionario values (36177472, 'Tecla', 'Farias', 'Contador', 10, 22998748);
+
+--/*/*/ REALIZA SERVICIO (nroDocumento, idServicio) /*/*/--
+insert into realizaservicio values (35896225, 1);
+insert into realizaservicio values (34125558, 4);
+insert into realizaservicio values (39567449, 5);
+insert into realizaservicio values (39567449, 6);
+insert into realizaservicio values (23665456, 2);
+insert into realizaservicio values (29856313, 4);
+insert into realizaservicio values (38723366, 4);
+insert into realizaservicio values (38723366, 5);
+insert into realizaservicio values (20578445, 3);
+insert into realizaservicio values (26313252, 6);
+insert into realizaservicio values (39665172, 4);
+insert into realizaservicio values (39665172, 5);
+insert into realizaservicio values (22596888, 1);
+insert into realizaservicio values (22355222, 4);
+insert into realizaservicio values (37598221, 5);
+insert into realizaservicio values (37598221, 6);
+insert into realizaservicio values (28144456, 2);
+insert into realizaservicio values (22998748, 5);
+insert into realizaservicio values (36177472, 4);
+insert into realizaservicio values (36177472, 6);
+
+--/*/*/ CITAS (idCita, fechaCita, horarioCita, nroCliente, duracionCita, idOficina, nroDocumento, idServicio, dia) /*/*/--
+insert into cita values (1, '2021/06/01', '08:00:00', 1, 30, 1, 35896225, 1, 'Martes');
+insert into cita values (2, '2021/06/17', '09:00:00', 1, 30, 1, 35896225, 1, 'Jueves');
+insert into cita values (3, '2021/06/01', '08:35:00', 3, 30, 1, 35896225, 1, 'Martes');
+insert into cita values (4, '2021/06/15', '08:00:00', 1, 30, 2, 39567449, 5, 'Viernes');
+insert into cita values (5, '2021/06/15', '08:35:00', 2, 30, 2, 34125558, 4, 'Viernes');
+insert into cita values (6, '2021/06/15', '09:10:00', 3, 30, 2, 39567449, 6, 'Viernes');
+insert into cita values (7, '2021/06/02', '09:00:00', 4, 30, 3, 23665456, 2, 'Miercoles');
+insert into cita values (8, '2021/06/02', '09:35:00', 5, 30, 3, 23665456, 2, 'Miercoles');
+insert into cita values (9, '2021/06/09', '10:00:00', 6, 30, 3, 23665456, 2, 'Miercoles');
+insert into cita values (10, '2021/06/24', '08:00:00', 4, 30, 4, 29856313, 4, 'Jueves');
+insert into cita values (11, '2021/06/24', '09:00:00', 5, 30, 4, 38723366, 4, 'Jueves');
+insert into cita values (12, '2021/06/25', '10:30:00', 6, 30, 4, 38723366, 5, 'Viernes');
+insert into cita values (13, '2021/06/28', '08:00:00', 7, 30, 5, 20578445, 3, 'Lunes');
+insert into cita values (14, '2021/06/28', '08:35:00', 8, 30, 5, 20578445, 3, 'Lunes');
+insert into cita values (15, '2021/06/28', '09:10:00', 9, 30, 5, 20578445, 3, 'Lunes');
+insert into cita values (16, '2021/06/29', '08:00:00', 7, 30, 6, 26313252, 6, 'Martes');
+insert into cita values (17, '2021/06/29', '09:00:00', 8, 30, 6, 26313252, 5, 'Martes');
+insert into cita values (18, '2021/06/30', '10:30:00', 8, 30, 6, 39665172, 5, 'Miercoles');
+insert into cita values (19, '2021/06/17', '08:00:00', 10, 30, 7, 22596888, 1, 'Jueves');
+insert into cita values (20, '2021/06/25', '10:00:00', 10, 30, 7, 22596888, 1, 'Viernes');
+insert into cita values (21, '2021/06/25', '10:35:00', 11, 30, 7, 22596888, 1, 'Viernes');
+insert into cita values (22, '2021/06/10', '08:00:00', 10, 30, 8, 22355222, 4, 'Jueves');
+insert into cita values (23, '2021/06/10', '09:00:00', 11, 30, 8, 37598221, 5, 'Jueves');
+insert into cita values (24, '2021/06/10', '10:00:00', 12, 30, 8, 37598221, 6, 'Jueves');
+insert into cita values (25, '2021/06/28', '08:00:00', 13, 30, 9, 28144456, 2, 'Lunes');
+insert into cita values (26, '2021/06/28', '10:00:00', 14, 30, 9, 28144456, 2, 'Lunes');
+insert into cita values (27, '2021/06/28', '10:35:00', 15, 30, 9, 28144456, 2, 'Lunes');
+insert into cita values (28, '2021/06/07', '08:00:00', 13, 30, 10, 22998748, 5, 'Lunes');
+insert into cita values (29, '2021/06/07', '09:00:00', 15, 30, 10, 36177472, 6, 'Lunes');
+insert into cita values (30, '2021/06/14', '09:00:00', 15, 30, 10, 36177472, 6, 'Lunes');
+
+--/*/*/ ESTADOS DE CITA (idCita, idEstado, descripcion, fechaEstado, horaEstado) /*/*/--
+insert into estadocita values (1, 1, 'Finalizada', '2021/06/01', '08:30:00');
+insert into estadocita values (2, 2, 'Cancelada', '2021/06/17', '08:30:00');
+insert into estadocita values (3, 3, 'Finalizada', '2021/06/01', '09:05:00');
+insert into estadocita values (4, 4, 'Finalizada', '2021/06/15', '08:30:00');
+insert into estadocita values (5, 5, 'Cancelada', '2021/06/15', '09:05:00');
+insert into estadocita values (6, 6, 'Finalizada', '2021/06/15', '09:40:00');
+insert into estadocita values (7, 7, 'Finalizada', '2021/06/02', '09:30:00');
+insert into estadocita values (8, 8, 'Finalizada', '2021/06/02', '10:05:00');
+insert into estadocita values (9, 9, 'Cancelada', '2021/06/09', '09:30:00');
+insert into estadocita values (10, 10, 'Cancelada', '2021/06/23', '10:30:00');
+insert into estadocita values (11, 11, 'Finalizada', '2021/06/24', '09:30:00');
+insert into estadocita values (12, 12, 'Finalizada', '2021/06/25', '11:00:00');
+insert into estadocita values (13, 13, 'Finalizada', '2021/06/28', '08:30:00');
+insert into estadocita values (14, 14, 'Cancelada', '2021/06/28', '08:00:00');
+insert into estadocita values (15, 15, 'Cancelada', '2021/06/28', '08:00:00');
+insert into estadocita values (16, 16, 'Finalizada', '2021/06/29', '08:30:00');
+insert into estadocita values (17, 17, 'Finalizada', '2021/06/29', '09:30:00');
+insert into estadocita values (18, 18, 'Finalizada', '2021/06/30', '11:00:00');
+insert into estadocita values (19, 19, 'Finalizada', '2021/06/17', '08:30:00');
+insert into estadocita values (20, 20, 'Finalizada', '2021/06/25', '10:30:00');
+insert into estadocita values (21, 21, 'Cancelada', '2021/06/25', '10:00:00');
+insert into estadocita values (22, 22, 'Finalizada', '2021/06/10', '08:30:00');
+insert into estadocita values (23, 23, 'Cancelada', '2021/06/10', '08:00:00');
+insert into estadocita values (24, 24, 'Cancelada', '2021/06/10', '08:00:00');
+insert into estadocita values (25, 25, 'Finalizada', '2021/06/28', '08:30:00');
+insert into estadocita values (26, 26, 'Finalizada', '2021/06/28', '10:30:00');
+insert into estadocita values (27, 27, 'Finalizada', '2021/06/28', '11:05:00');
+insert into estadocita values (28, 28, 'Finalizada', '2021/06/07', '08:30:00');
+insert into estadocita values (29, 29, 'Finalizada', '2021/06/07', '09:30:00');
+insert into estadocita values (30, 30, 'Cancelada', '2021/06/14', '08:00:00');

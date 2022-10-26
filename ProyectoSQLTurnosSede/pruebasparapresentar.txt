@@ -1,0 +1,28 @@
+-- PRUEBA TRIGGER FECHA PASADA --
+insert into cita values (31, '2021/06/01', '10:00:00', 2, 30, 1, 35896225, 1, 'Martes');
+insert into cita values (31, '2021/07/26', '9:00:00', 2, 30, 1, 35896225, 1, 'Viernes');
+
+-- PRUEBA TRIGGER HORARIOS SOLAPADOS --
+insert into cita values (32, '2021/07/26', '9:15:00', 1, 30, 1, 35896225, 1, 'Viernes');
+insert into cita values (32, '2021/07/26', '9:35:00', 1, 30, 1, 35896225, 1, 'Viernes');
+
+-- PRUEBA TRIGGER CITA EN UN MISMO TURNO --
+insert into cita values (33, '2021/07/26', '10:10:00', 2, 30, 1, 35896225, 1, 'Viernes');
+insert into cita values (33, '2021/07/27', '10:10:00', 2, 30, 1, 35896225, 1, 'Lunes');
+
+-- PRUEBA DOMINIO CP --
+insert into Cliente values (32600, 16, 'mantequita3@gmail.com', null, '3442 86-1443', 'Suipacha', 348, 1, 'C');
+
+-- PRUEBA DOMINIO MAIL --
+insert into Cliente values (3260, 16, 'mantequitagmail.com', null, '3442 86-1443', 'Suipacha', 348, 1, 'C');
+
+-- PRUEBA DOMINIO NUMERO TELEFONO --
+insert into Cliente values (3260, 16, 'mantequita@gmail.com', null, '34 386-1443', 'Suipacha', 348, 1, 'C');
+insert into Cliente values (3260, 16, 'mantequita@gmail.com', null, '344 86-1443', 'Suipacha', 348, 1, 'C');
+insert into Cliente values (3260, 16, 'mantequita@gmail.com', null, '3442 386-1443', 'Suipacha', 348, 1, 'C');
+
+-- PRUEBA DOMINIO CUIL --
+insert into personafisica values ('Gómez', 'Gomito', '19-29663356-2', 29663356, 14);
+
+-- PRUEBA DOMINIO CUIT --
+insert into personajuridica values ('Piojopum', '35-11852334-9', 15);
